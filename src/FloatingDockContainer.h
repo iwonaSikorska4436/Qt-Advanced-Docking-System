@@ -248,6 +248,15 @@ public:
      * function of the internal container widget.
      */
     QList<CDockWidget*> dockWidgets() const;
+
+#ifdef Q_OS_LINUX
+    /**
+     * This is a function respond to FloatingWidgetTitleBar::maximizeRequest()
+     * maximize or normalize the container size.
+     */
+    void onMaximizeRequest();
+#endif
+
 }; // class FloatingDockContainer
 }
  // namespace ads
