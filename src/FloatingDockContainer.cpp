@@ -377,7 +377,6 @@ struct FloatingDockContainerPrivate
 #ifdef Q_OS_LINUX
     QWidget* MouseEventHandler = nullptr;
     CFloatingWidgetTitleBar* TitleBar = nullptr;
-    QRect LastGeometry;
 #endif
 
 	/**
@@ -612,7 +611,6 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
     QDockWidget::setFloating(true);
     QDockWidget::setFeatures(QDockWidget::AllDockWidgetFeatures);
     setTitleBarWidget(d->TitleBar);
-    d->LastGeometry = geometry();
     connect(d->TitleBar, SIGNAL(closeRequested()), SLOT(close()));
     connect(d->TitleBar, &CFloatingWidgetTitleBar::maximizeRequested,
             this, &CFloatingDockContainer::onMaximizeRequest);
@@ -1126,15 +1124,14 @@ void CFloatingDockContainer::onMaximizeRequest()
     }
     ADS_PRINT("CFloatingDockContainer::onMaximizeRequest() current screen: " + currentScreen->name());
     // get current windows state, if it is maximized and moved or not
-    if (geometry().size() == currentScreen->availableGeometry().size())
+    if (windowState() == Qt::WindowMaximized)
     {
-        setGeometry(d->LastGeometry);
+        setWindowState(Qt::WindowNoState);
         d->TitleBar->setMaximizedIcon(false);
     }
     else
     {
-        d->LastGeometry = geometry();
-        setGeometry(currentScreen->availableGeometry());
+        setWindowState(Qt::WindowMaximized);
         d->TitleBar->setMaximizedIcon(true);
     }
 }
