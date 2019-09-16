@@ -255,6 +255,9 @@ public:
      * maximize or normalize the container size.
      */
     void onMaximizeRequest();
+    void dragToNormalize();
+
+    bool isMaximized() const;
 #endif
 
 }; // class FloatingDockContainer

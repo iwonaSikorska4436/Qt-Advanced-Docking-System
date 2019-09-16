@@ -377,6 +377,8 @@ struct FloatingDockContainerPrivate
 #ifdef Q_OS_LINUX
     QWidget* MouseEventHandler = nullptr;
     CFloatingWidgetTitleBar* TitleBar = nullptr;
+    QRect NormalizedGeometry = {0,0,0,0};
+    bool IsMaximized = false;
 #endif
 
 	/**
@@ -828,9 +830,11 @@ void CFloatingDockContainer::startFloating(const QPoint &DragStartMousePos,
 #ifndef Q_OS_LINUX
 	Q_UNUSED(MouseEventHandler)
 #endif
-	resize(Size);
-	d->setState(DragState);
-	d->DragStartMousePosition = DragStartMousePos;
+    if (!isMaximized()) {
+        resize(Size);
+        d->DragStartMousePosition = DragStartMousePos;
+    }
+    d->setState(DragState);
 #ifdef Q_OS_LINUX
 	if (DraggingFloatingWidget == DragState)
 	{
@@ -842,7 +846,9 @@ void CFloatingDockContainer::startFloating(const QPoint &DragStartMousePos,
 		}
 	}
 #endif
-	moveFloating();
+    if (!isMaximized()) {
+        moveFloating();
+    }
 	show();
 }
 
@@ -1124,17 +1130,46 @@ void CFloatingDockContainer::onMaximizeRequest()
     }
     ADS_PRINT("CFloatingDockContainer::onMaximizeRequest() current screen: " + currentScreen->name());
     // get current windows state, if it is maximized and moved or not
-    if (windowState() == Qt::WindowMaximized)
+    if (geometry().size() == currentScreen->availableGeometry().size())
     {
-        setWindowState(Qt::WindowNoState);
+        setGeometry(d->NormalizedGeometry);
         d->TitleBar->setMaximizedIcon(false);
+        d->IsMaximized = false;
     }
     else
     {
-        setWindowState(Qt::WindowMaximized);
+        qDebug() << "maximize";
+        d->NormalizedGeometry = geometry();
+        d->IsMaximized = true;
+        setGeometry(currentScreen->availableGeometry());
         d->TitleBar->setMaximizedIcon(true);
     }
 }
+
+    void CFloatingDockContainer::dragToNormalize()
+    {
+        auto cursorPos = QCursor::pos();
+        qDebug() << "pos" << cursorPos;
+        auto screen = QGuiApplication::screenAt(QCursor::pos());
+        if (d->IsMaximized) {
+            auto screenGeometry = screen->availableGeometry();
+            QRect r = QRect(cursorPos.x()
+                    -(cursorPos.x() - screenGeometry.left())/(double)screenGeometry.width() * d->NormalizedGeometry.width(),
+                            cursorPos.y(), d->NormalizedGeometry.width(),d->NormalizedGeometry.height());
+            qDebug() << "rect"<<r;
+            move(r.left(), r.top());
+            resize(r.width(), r.height());
+            d->IsMaximized = false;
+            qDebug() << "geometry" << geometry();
+        }
+    }
+
+    bool CFloatingDockContainer::isMaximized() const
+    {
+        // todo when initialized with maximum size?
+        return d->IsMaximized;
+    }
+
 #endif
 
 } // namespace ads
