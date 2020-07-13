@@ -145,20 +145,18 @@ void DockFocusControllerPrivate::updateDockWidgetFocus(CDockWidget* DockWidget)
 #ifdef Q_OS_LINUX
 	// This code is required for styling the floating widget titlebar for linux
 	// depending on the current focus state
-    if (FloatingWidget == NewFloatingWidget)
+    if (FloatingWidget != NewFloatingWidget)
     {
-        return;
-    }
+        if (FloatingWidget)
+        {
+            updateFloatingWidgetFocusStyle(FloatingWidget, false);
+        }
+        FloatingWidget = NewFloatingWidget;
 
-    if (FloatingWidget)
-    {
-        updateFloatingWidgetFocusStyle(FloatingWidget, false);
-    }
-    FloatingWidget = NewFloatingWidget;
-
-    if (FloatingWidget)
-    {
-        updateFloatingWidgetFocusStyle(FloatingWidget, true);
+        if (FloatingWidget)
+        {
+            updateFloatingWidgetFocusStyle(FloatingWidget, true);
+        }
     }
 #endif
 
