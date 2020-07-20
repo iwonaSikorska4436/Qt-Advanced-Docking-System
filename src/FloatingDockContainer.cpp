@@ -1128,7 +1128,6 @@ void CFloatingDockContainer::onMaximizeRequest()
         auto maxX = qMin(screenRect.right(), widgetRect.right());
         auto maxY = qMin(screenRect.bottom(), widgetRect.bottom());
         auto area = minX < maxX && minY < maxY ? (maxX - minX) * (maxY - minY) : 0;
-        qDebug() << screenRect << "area" << area << screen->availableVirtualGeometry();
         if (area > maxArea)
         {
             maxArea = area;
@@ -1153,7 +1152,6 @@ void CFloatingDockContainer::onMaximizeRequest()
     }
     else
     {
-        qDebug() << "maximize";
         d->NormalizedGeometry = geometry();
         d->IsMaximized = true;
         setGeometry(currentScreen->availableGeometry());
@@ -1164,7 +1162,6 @@ void CFloatingDockContainer::onMaximizeRequest()
     void CFloatingDockContainer::dragToNormalize()
     {
         auto cursorPos = QCursor::pos();
-        qDebug() << "pos" << cursorPos;
 #if QT_VERSION > QT_VERSION_CHECK(5, 10, 0)
         QScreen *screen = QGuiApplication::screenAt(QCursor::pos());
 #else
@@ -1184,11 +1181,9 @@ void CFloatingDockContainer::onMaximizeRequest()
             QRect r = QRect(cursorPos.x()
                     -(cursorPos.x() - screenGeometry.left())/(double)screenGeometry.width() * d->NormalizedGeometry.width(),
                             cursorPos.y(), d->NormalizedGeometry.width(),d->NormalizedGeometry.height());
-            qDebug() << "rect"<<r;
             setGeometry(r);
             d->IsMaximized = false;
-            d->TitleBar->setMaximizedIcon(true);
-            qDebug() << "geometry" << geometry();
+			d->TitleBar->setMaximizedIcon(false);
         }
     }
 
