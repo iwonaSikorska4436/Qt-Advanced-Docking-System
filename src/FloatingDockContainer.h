@@ -251,13 +251,19 @@ public:
 
 #ifdef Q_OS_LINUX
     /**
-     * This is a function respond to FloatingWidgetTitleBar::maximizeRequest()
-     * maximize or normalize the container size.
+	 * This is a function that responds to FloatingWidgetTitleBar::maximizeRequest()
+	 * Maximize or normalize the container size.
      */
     void onMaximizeRequest();
 
+	/**
+	 * Normalize / resize the window size when dragging a maximized window.
+	 */
     void dragToNormalize();
 
+	/**
+	 * Returns if the window is currently maximized or not.
+	 */
     bool isMaximized() const;
 #endif
 
