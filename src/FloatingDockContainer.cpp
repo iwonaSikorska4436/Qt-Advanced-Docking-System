@@ -53,7 +53,6 @@
 #endif
 #endif
 #ifdef Q_OS_LINUX
-#include <QScreen>
 #include "linux/FloatingWidgetTitleBar.h"
 #include <xcb/xcb.h>
 #endif
@@ -377,8 +376,6 @@ struct FloatingDockContainerPrivate
 #ifdef Q_OS_LINUX
     QWidget* MouseEventHandler = nullptr;
     CFloatingWidgetTitleBar* TitleBar = nullptr;
-    QRect NormalizedGeometry = {0,0,0,0};
-    bool IsMaximized = false;
 #endif
 
 	/**
@@ -832,18 +829,17 @@ void CFloatingDockContainer::startFloating(const QPoint &DragStartMousePos,
 #endif
 #ifdef Q_OS_LINUX
     if (!isMaximized()) {
-        resize(Size);
-        d->DragStartMousePosition = DragStartMousePos;
+		resize(Size);
+		d->DragStartMousePosition = DragStartMousePos;
     }
 #else
-    resize(Size);
-    d->DragStartMousePosition = DragStartMousePos;
+	resize(Size);
+	d->DragStartMousePosition = DragStartMousePos;
 #endif
-    d->setState(DragState);
+	d->setState(DragState);
 #ifdef Q_OS_LINUX
 	if (DraggingFloatingWidget == DragState)
 	{
-        setAttribute(Qt::WA_X11NetWmWindowTypeDock, true);
 		d->MouseEventHandler = MouseEventHandler;
 		if (d->MouseEventHandler)
 		{
@@ -852,12 +848,12 @@ void CFloatingDockContainer::startFloating(const QPoint &DragStartMousePos,
 	}
 #endif
 #ifdef Q_OS_LINUX
-    if (!isMaximized()) {
-        moveFloating();
-    }
+	if (!isMaximized()) {
+		moveFloating();
+	}
 	show();
 #else
-    moveFloating();
+	moveFloating();
 	show();
 #endif
 }
@@ -968,10 +964,13 @@ bool CFloatingDockContainer::restoreState(CDockingStateReader &Stream,
 	{
 		return false;
 	}
-
 	onDockAreasAddedOrRemoved();
+#ifdef Q_OS_LINUX
+	d->TitleBar->setMaximizedIcon(windowState() == Qt::WindowMaximized);
+#endif
 	return true;
 }
+
 
 //============================================================================
 bool CFloatingDockContainer::hasTopLevelDockWidget() const
@@ -996,16 +995,15 @@ void CFloatingDockContainer::finishDragging()
 {
 	ADS_PRINT("CFloatingDockContainer::finishDragging");
 #ifdef Q_OS_LINUX
-   setAttribute(Qt::WA_X11NetWmWindowTypeDock, false);
-   setWindowOpacity(1);
-   activateWindow();
-   if (d->MouseEventHandler)
-   {
-       d->MouseEventHandler->releaseMouse();
-       d->MouseEventHandler = nullptr;
-   }
+	setWindowOpacity(1);
+	activateWindow();
+	if (d->MouseEventHandler)
+	{
+	   d->MouseEventHandler->releaseMouse();
+	   d->MouseEventHandler = nullptr;
+	}
 #endif
-   d->titleMouseReleaseEvent();
+	d->titleMouseReleaseEvent();
 }
 
 #ifdef Q_OS_MACOS
@@ -1110,88 +1108,42 @@ void CFloatingDockContainer::moveEvent(QMoveEvent *event)
 }
 #endif
 
+
 #ifdef Q_OS_LINUX
 void CFloatingDockContainer::onMaximizeRequest()
 {
-    ADS_PRINT("CFloatingDockContainer::onMaximizeRequest()");
-    QRect screenRect;
-    QRect widgetRect;
-    const QScreen *currentScreen = nullptr;
-    int maxArea = 0;
-    // get current screen
-    for (const auto &screen : QGuiApplication::screens())
-    {
-        screenRect = screen->geometry();
-        widgetRect = this->geometry();
-        auto minX = qMax(screenRect.left(), widgetRect.left());
-        auto minY = qMax(screenRect.top(), widgetRect.top());
-        auto maxX = qMin(screenRect.right(), widgetRect.right());
-        auto maxY = qMin(screenRect.bottom(), widgetRect.bottom());
-        auto area = minX < maxX && minY < maxY ? (maxX - minX) * (maxY - minY) : 0;
-        if (area > maxArea)
-        {
-            maxArea = area;
-            currentScreen = screen;
-        }
-    }
-    if (!currentScreen)
-    {
-        return;
-    }
-    ADS_PRINT("CFloatingDockContainer::onMaximizeRequest() current screen: " + currentScreen->name());
-    // get current windows state, if it is maximized and moved or not
-    if (geometry().size() == currentScreen->availableGeometry().size())
-    {
-        if (d->NormalizedGeometry.width() == 0) {
-            d->NormalizedGeometry = geometry().adjusted(geometry().width()/3, geometry().height()/3,
-                                                        -geometry().width()/3, -geometry().height()/3);
-        }
-        setGeometry(d->NormalizedGeometry);
-        d->TitleBar->setMaximizedIcon(false);
-        d->IsMaximized = false;
-    }
-    else
-    {
-        d->NormalizedGeometry = geometry();
-        d->IsMaximized = true;
-        setGeometry(currentScreen->availableGeometry());
-        d->TitleBar->setMaximizedIcon(true);
-    }
+	if(windowState() == Qt::WindowMaximized){
+		showNormal();
+	}else{
+		showMaximized();
+	}
 }
 
-    void CFloatingDockContainer::dragToNormalize()
-    {
-        auto cursorPos = QCursor::pos();
-#if QT_VERSION > QT_VERSION_CHECK(5, 10, 0)
-        QScreen *screen = QGuiApplication::screenAt(QCursor::pos());
-#else
-        QScreen *screen = nullptr;
-        for (const auto &sc : QGuiApplication::screens()) {
-            if (sc->geometry().contains(cursorPos)) {
-                screen = sc;
-            }
-        }
-#endif
-        if (screen && d->IsMaximized) {
-            if (d->NormalizedGeometry.width() == 0) {
-                d->NormalizedGeometry = geometry().adjusted(geometry().width()/3, geometry().height()/3,
-                                                            -geometry().width()/3, -geometry().height()/3);
-            }
-            auto screenGeometry = screen->availableGeometry();
-            QRect r = QRect(cursorPos.x()
-                    -(cursorPos.x() - screenGeometry.left())/(double)screenGeometry.width() * d->NormalizedGeometry.width(),
-                            cursorPos.y(), d->NormalizedGeometry.width(),d->NormalizedGeometry.height());
-            setGeometry(r);
-            d->IsMaximized = false;
-			d->TitleBar->setMaximizedIcon(false);
-        }
-    }
+void CFloatingDockContainer::showNormal(bool fixGeometry)
+{
+	if (windowState() == Qt::WindowMaximized)
+	{
+		QRect oldNormal = normalGeometry();
+		Super::showNormal();
+		if(fixGeometry)
+		{
+			setGeometry(oldNormal);
+		}
+	}
+	d->TitleBar->setMaximizedIcon(false);
+}
 
-    bool CFloatingDockContainer::isMaximized() const
-    {
-        // todo when initialized with maximum size?
-        return d->IsMaximized;
-    }
+void CFloatingDockContainer::showMaximized()
+{
+	Super::showMaximized();
+	d->TitleBar->setMaximizedIcon(true);
+}
+
+bool CFloatingDockContainer::isMaximized() const
+{
+	// todo when initialized with maximum size?
+	return windowState() == Qt::WindowMaximized;
+}
 
 #endif
 

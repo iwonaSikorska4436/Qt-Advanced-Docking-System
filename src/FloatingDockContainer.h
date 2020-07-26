@@ -257,9 +257,17 @@ public:
     void onMaximizeRequest();
 
 	/**
-	 * Normalize / resize the window size when dragging a maximized window.
+	 * Normalize (Unmaximize) the window.
+	 *	fixGeometry fixes a "bug" in QT where immediately after calling showNormal
+	 *	geometry is not set properly.
+	 *	Set this true when moving the window immediately after normalizing.
 	 */
-    void dragToNormalize();
+	void showNormal(bool fixGeometry=false);
+
+	/**
+	 * Maximizes the window.
+	 */
+	void showMaximized();
 
 	/**
 	 * Returns if the window is currently maximized or not.

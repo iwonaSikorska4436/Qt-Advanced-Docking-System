@@ -160,7 +160,7 @@ void CFloatingWidgetTitleBar::mouseReleaseEvent(QMouseEvent *ev)
 	d->DragState = DraggingInactive;
     if (d->FloatingWidget)
     {
-        d->FloatingWidget->finishDragging();
+		d->FloatingWidget->finishDragging();
     }
 	Super::mouseReleaseEvent(ev);
 }
@@ -179,7 +179,10 @@ void CFloatingWidgetTitleBar::mouseMoveEvent(QMouseEvent *ev)
 	if (DraggingFloatingWidget == d->DragState)
 	{
 #ifdef Q_OS_LINUX
-	    d->FloatingWidget->dragToNormalize();
+		if(d->FloatingWidget->isMaximized())
+		{
+			d->FloatingWidget->showNormal(true);
+		}
 #endif
 		d->FloatingWidget->moveFloating();
 		Super::mouseMoveEvent(ev);
