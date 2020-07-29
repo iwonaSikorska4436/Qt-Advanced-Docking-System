@@ -605,12 +605,12 @@ CFloatingDockContainer::CFloatingDockContainer(CDockManager *DockManager) :
 
 #ifdef Q_OS_LINUX
     d->TitleBar = new CFloatingWidgetTitleBar(this);
-	setWindowFlag(Qt::Tool, false);
-	setWindowFlag(Qt::Window, true);
     QDockWidget::setWidget(d->DockContainer);
     QDockWidget::setFloating(true);
     QDockWidget::setFeatures(QDockWidget::AllDockWidgetFeatures);
     setTitleBarWidget(d->TitleBar);
+	setWindowFlag(Qt::Tool, false);
+	setWindowFlag(Qt::Window, true);
     connect(d->TitleBar, SIGNAL(closeRequested()), SLOT(close()));
     connect(d->TitleBar, &CFloatingWidgetTitleBar::maximizeRequested,
             this, &CFloatingDockContainer::onMaximizeRequest);
