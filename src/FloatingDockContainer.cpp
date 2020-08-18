@@ -968,7 +968,7 @@ bool CFloatingDockContainer::restoreState(CDockingStateReader &Stream,
 	}
 	onDockAreasAddedOrRemoved();
 #ifdef Q_OS_LINUX
-	d->TitleBar->setMaximizedIcon(windowState() == Qt::WindowMaximized);
+    d->TitleBar->setMaximizeIcon(windowState() == Qt::WindowMaximized);
 #endif
 	return true;
 }
@@ -1132,13 +1132,13 @@ void CFloatingDockContainer::showNormal(bool fixGeometry)
 			setGeometry(oldNormal);
 		}
 	}
-	d->TitleBar->setMaximizedIcon(false);
+    d->TitleBar->setMaximizeIcon(false);
 }
 
 void CFloatingDockContainer::showMaximized()
 {
 	Super::showMaximized();
-	d->TitleBar->setMaximizedIcon(true);
+    d->TitleBar->setMaximizeIcon(true);
 }
 
 bool CFloatingDockContainer::isMaximized() const
