@@ -106,7 +106,7 @@ void FloatingWidgetTitleBarPrivate::createLayout()
 	CloseButton->setFocusPolicy(Qt::NoFocus);
 	_this->connect(CloseButton, SIGNAL(clicked()), SIGNAL(closeRequested()));
 
-    _this->setMaximizeIcon(false);
+    _this->setMaximizedIcon(false);
     MaximizeButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     MaximizeButton->setVisible(true);
     MaximizeButton->setFocusPolicy(Qt::NoFocus);
@@ -144,6 +144,7 @@ CFloatingWidgetTitleBar::CFloatingWidgetTitleBar(CFloatingDockContainer *parent)
     auto maxPixmap = this->style()->standardPixmap(QStyle::SP_TitleBarMaxButton, 0, d->MaximizeButton);
     d->MaximizeIcon.addPixmap(maxPixmap, QIcon::Normal);
     d->MaximizeIcon.addPixmap(internal::createTransparentPixmap(maxPixmap, 0.25), QIcon::Disabled);
+    setMaximizedIcon(d->Maximized);
 }
 
 //============================================================================
@@ -239,7 +240,7 @@ void CFloatingWidgetTitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 
 
 //============================================================================
-void CFloatingWidgetTitleBar::setMaximizeIcon(bool maximized)
+void CFloatingWidgetTitleBar::setMaximizedIcon(bool maximized)
 {
     d->Maximized = maximized;
     if (maximized)
@@ -259,7 +260,7 @@ void CFloatingWidgetTitleBar::setMaximizeIcon(const QIcon& Icon)
     d->MaximizeIcon = Icon;
     if (d->Maximized)
     {
-        setMaximizeIcon(d->Maximized);
+        setMaximizedIcon(d->Maximized);
     }
 }
 
@@ -270,7 +271,7 @@ void CFloatingWidgetTitleBar::setNormalIcon(const QIcon& Icon)
     d->NormalIcon = Icon;
     if (!d->Maximized)
     {
-        setMaximizeIcon(d->Maximized);
+        setMaximizedIcon(d->Maximized);
     }
 }
 

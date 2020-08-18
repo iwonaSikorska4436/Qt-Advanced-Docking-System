@@ -93,7 +93,7 @@ public:
     /**
      * Change the maximize button icon according to current windows state
      */
-    void setMaximizeIcon(bool maximized);
+    void setMaximizedIcon(bool maximized);
 
 signals:
 	/**

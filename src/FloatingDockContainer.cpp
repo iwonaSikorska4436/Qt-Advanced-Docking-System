@@ -848,9 +848,9 @@ void CFloatingDockContainer::startFloating(const QPoint &DragStartMousePos,
 			d->MouseEventHandler->grabMouse();
 		}
 	}
-#endif
-#ifdef Q_OS_LINUX
-	if (!isMaximized()) {
+
+    if (!isMaximized())
+    {
 		moveFloating();
 	}
 	show();
@@ -968,7 +968,7 @@ bool CFloatingDockContainer::restoreState(CDockingStateReader &Stream,
 	}
 	onDockAreasAddedOrRemoved();
 #ifdef Q_OS_LINUX
-    d->TitleBar->setMaximizeIcon(windowState() == Qt::WindowMaximized);
+    d->TitleBar->setMaximizedIcon(windowState() == Qt::WindowMaximized);
 #endif
 	return true;
 }
@@ -1112,6 +1112,7 @@ void CFloatingDockContainer::moveEvent(QMoveEvent *event)
 
 
 #ifdef Q_OS_LINUX
+//============================================================================
 void CFloatingDockContainer::onMaximizeRequest()
 {
 	if(windowState() == Qt::WindowMaximized){
@@ -1121,6 +1122,8 @@ void CFloatingDockContainer::onMaximizeRequest()
 	}
 }
 
+
+//============================================================================
 void CFloatingDockContainer::showNormal(bool fixGeometry)
 {
 	if (windowState() == Qt::WindowMaximized)
@@ -1132,15 +1135,19 @@ void CFloatingDockContainer::showNormal(bool fixGeometry)
 			setGeometry(oldNormal);
 		}
 	}
-    d->TitleBar->setMaximizeIcon(false);
+    d->TitleBar->setMaximizedIcon(false);
 }
 
+
+//============================================================================
 void CFloatingDockContainer::showMaximized()
 {
 	Super::showMaximized();
-    d->TitleBar->setMaximizeIcon(true);
+    d->TitleBar->setMaximizedIcon(true);
 }
 
+
+//============================================================================
 bool CFloatingDockContainer::isMaximized() const
 {
 	// todo when initialized with maximum size?

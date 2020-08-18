@@ -130,7 +130,7 @@ ads--CDockAreaWidget[focused="true"] ads--CDockAreaTitleBar {
 
 
 ads--CFloatingWidgetTitleBar {
-    background: palette(dark);
+    background: palette(midlight);
     qproperty-maximizeIcon: url(:/ads/images/maximize-button.svg);
     qproperty-normalIcon: url(:/ads/images/restore-button.svg);
 }
