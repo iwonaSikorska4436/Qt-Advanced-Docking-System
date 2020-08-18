@@ -248,6 +248,33 @@ public:
      * function of the internal container widget.
      */
     QList<CDockWidget*> dockWidgets() const;
+
+#ifdef Q_OS_LINUX
+    /**
+	 * This is a function that responds to FloatingWidgetTitleBar::maximizeRequest()
+	 * Maximize or normalize the container size.
+     */
+    void onMaximizeRequest();
+
+	/**
+	 * Normalize (Unmaximize) the window.
+	 *	fixGeometry fixes a "bug" in QT where immediately after calling showNormal
+	 *	geometry is not set properly.
+	 *	Set this true when moving the window immediately after normalizing.
+	 */
+	void showNormal(bool fixGeometry=false);
+
+	/**
+	 * Maximizes the window.
+	 */
+	void showMaximized();
+
+	/**
+	 * Returns if the window is currently maximized or not.
+	 */
+    bool isMaximized() const;
+#endif
+
 }; // class FloatingDockContainer
 }
  // namespace ads
